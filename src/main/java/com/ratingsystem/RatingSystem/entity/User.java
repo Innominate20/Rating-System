@@ -14,8 +14,8 @@ import java.util.Date;
 import java.util.Enumeration;
 
 @Entity
-@Builder
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
