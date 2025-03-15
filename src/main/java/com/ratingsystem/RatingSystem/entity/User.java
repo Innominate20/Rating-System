@@ -3,10 +3,7 @@ package com.ratingsystem.RatingSystem.entity;
 import com.ratingsystem.RatingSystem.enums.Status;
 import jakarta.persistence.*;
 import com.ratingsystem.RatingSystem.enums.Role;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.xml.crypto.Data;
 import java.time.LocalDate;
@@ -15,7 +12,11 @@ import java.util.Enumeration;
 
 @Entity
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
+@Setter
+@Getter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

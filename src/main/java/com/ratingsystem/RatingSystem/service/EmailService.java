@@ -18,8 +18,7 @@ public class EmailService {
     public void sendVerificationCode(String email, String token) throws MessagingException {
 
         String subject = "Account verification";
-        String content = "Click to verify : "
-                + "http://localhost:8080/verify?token=" + token;
+        String content = "Your token= " + token;
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
