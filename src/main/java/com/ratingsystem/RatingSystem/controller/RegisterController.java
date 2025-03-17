@@ -19,7 +19,7 @@ public class RegisterController {
 
     @PostMapping("/register")
     public ResponseEntity<String> registerMethod(@Valid @RequestBody UserRegisterRequest userRegisterRequest){
-        return registerService.registerUser(userRegisterRequest);
+        return registerService.registerSeller(userRegisterRequest);
 
     }
 

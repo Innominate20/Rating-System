@@ -1,12 +1,15 @@
 package com.ratingsystem.RatingSystem.service;
 
 import com.ratingsystem.RatingSystem.dto.UserRegisterRequest;
-import com.ratingsystem.RatingSystem.entity.User;
+import com.ratingsystem.RatingSystem.entity.Admin;
+import com.ratingsystem.RatingSystem.entity.Seller;
 import com.ratingsystem.RatingSystem.enums.Role;
 import com.ratingsystem.RatingSystem.enums.Status;
-import com.ratingsystem.RatingSystem.repository.UserRepository;
+import com.ratingsystem.RatingSystem.repository.AdminRepository;
+import com.ratingsystem.RatingSystem.repository.SellerRepository;
 import com.ratingsystem.RatingSystem.util.TokenGeneratorUtil;
 import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,48 +21,76 @@ import java.util.Optional;
 
 @Service
 public class RegisterService {
-    private final UserRepository userRepository;
+    private final SellerRepository sellerRepository;
+    private final AdminRepository adminRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final RedisService redisService;
+
     @Autowired
-    public RegisterService(UserRepository userRepository,BCryptPasswordEncoder passwordEncoder,
-                           EmailService emailService,RedisService redisService){
-        this.userRepository = userRepository;
+    public RegisterService(SellerRepository sellerRepository, AdminRepository adminRepository, BCryptPasswordEncoder passwordEncoder,
+                           EmailService emailService, RedisService redisService){
+        this.sellerRepository = sellerRepository;
+        this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
         this.redisService = redisService;
         this.emailService = emailService;
+
     }
 
-    public ResponseEntity<String> registerUser(UserRegisterRequest user) {
+    @Transactional
+    public ResponseEntity<String> registerSeller(UserRegisterRequest userRegisterRequest) {
 
-        // check if the email already exists
-        Optional<User> tmpUser = userRepository.findByEmail(user.getEmail());
-        if (tmpUser.isPresent()){
+
+        // check if the Seller already exists
+        Optional<Seller> tmpSeller = sellerRepository.findByEmail(userRegisterRequest.getEmail());
+        if (tmpSeller.isPresent()){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this email already exists !");
         }
 
-        User newUser = User.builder()
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .password(passwordEncoder.encode(user.getPassword()))
+        Seller newSeller = Seller.builder()
+                .firstName(userRegisterRequest.getFirstName())
+                .lastName(userRegisterRequest.getLastName())
+                .email(userRegisterRequest.getEmail())
+                .password(passwordEncoder.encode(userRegisterRequest.getPassword()))
                 .created_at(LocalDate.now())
                 .role(Role.SELLER)
+                .verified(false)
                 .status(Status.PENDING)
                 .build();
 
-        userRepository.save(newUser);
+        sellerRepository.save(newSeller);
+
 
         String token = TokenGeneratorUtil.generateToken();
-        redisService.storeToken(token,user.getEmail());
+        redisService.storeToken(token,userRegisterRequest.getEmail());
 
         try {
-            emailService.sendVerificationCode(user.getEmail(),token);
+            emailService.sendVerificationCode(userRegisterRequest.getEmail(),token);
         } catch (MessagingException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending verification code !");
         }
         return  ResponseEntity.status(HttpStatus.CREATED).body("User created, waiting verification !");
 
+    }
+
+    public ResponseEntity<String> registerAdmin(UserRegisterRequest userRegisterRequest){
+        Optional<Admin> optionalAdmin = adminRepository.findByEmail(userRegisterRequest.getEmail());
+        if (optionalAdmin.isPresent()){
+            ResponseEntity.status(HttpStatus.CONFLICT).body("User with this email already exists !");
+        }
+
+        Admin newAdmin = Admin.builder()
+                .firstName(userRegisterRequest.getFirstName())
+                .lastName(userRegisterRequest.getLastName())
+                .created_at(LocalDate.now())
+                .email(userRegisterRequest.getEmail())
+                .verified(true)
+                .status(Status.APPROVED)
+                .password(passwordEncoder.encode(userRegisterRequest.getPassword()))
+                .role(Role.ADMIN)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("User created, created !");
     }
 }

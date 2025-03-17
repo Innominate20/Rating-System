@@ -1,9 +1,8 @@
 package com.ratingsystem.RatingSystem.service;
 
-import com.ratingsystem.RatingSystem.entity.User;
-import com.ratingsystem.RatingSystem.repository.UserRepository;
+import com.ratingsystem.RatingSystem.entity.Seller;
+import com.ratingsystem.RatingSystem.repository.SellerRepository;
 import jakarta.transaction.Transactional;
-import org.aspectj.apache.bcel.classfile.Module;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +14,12 @@ import java.util.Optional;
 public class VerificationService {
 
     private final RedisService redisService;
-    private final UserRepository userRepository;
+    private final SellerRepository sellerRepository;
+
     @Autowired
-    public VerificationService(RedisService redisService, UserRepository userRepository) {
+    public VerificationService(RedisService redisService,SellerRepository sellerRepository) {
         this.redisService = redisService;
-        this.userRepository = userRepository;
+        this.sellerRepository = sellerRepository;
     }
 
     @Transactional
@@ -29,11 +29,15 @@ public class VerificationService {
 
         if(optional.isPresent()){
             String email = optional.get();
-            Optional<User> userToVerify =  userRepository.findByEmail(email);
-            userToVerify.get().setVerified(true);
+            Optional<Seller> userToVerify =  sellerRepository.findByEmail(email);
+            Seller tmpSeller = userToVerify.get();
+            tmpSeller.setVerified(true);
+            sellerRepository.save(tmpSeller);
+
             redisService.deleteToken(token);
            return ResponseEntity.status(HttpStatus.ACCEPTED).body("User verified successfully !");
         }
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Wrong token or Time expired !");
     }
 }

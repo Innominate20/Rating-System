@@ -23,6 +23,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtility jwtUtility;
     private final MyUserDetailService myUserDetailService;
+
     @Autowired
     public JwtFilter(JwtUtility jwtUtility, MyUserDetailService myUserDetailService) {
         this.jwtUtility = jwtUtility;
@@ -31,21 +32,31 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         String header = request.getHeader("Authorization");
 
-        if(header !=null && header.startsWith("Bearer ")){
-            String token = header.substring(7);
+        if (header == null || !header.startsWith("Bearer ")) {
+            filterChain.doFilter(request,response);
+            return;
+        }
 
+            String token = header.substring(7);
             String userEmail = jwtUtility.getUserEmail(token);
 
-            if(userEmail !=null && SecurityContextHolder.getContext().getAuthentication() == null){
-                throw new UsernameNotFoundException("User not found !");
-            }
-            UserDetails userDetails = myUserDetailService.loadUserByUsername(userEmail);
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                try {
+                    UserDetails userDetails = myUserDetailService.loadUserByUsername(userEmail);
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        }
-        filterChain.doFilter(request,response);
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                } catch (UsernameNotFoundException e) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not found");
+                }
+            }
+
+        filterChain.doFilter(request, response);
     }
 }

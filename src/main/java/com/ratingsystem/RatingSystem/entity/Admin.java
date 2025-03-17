@@ -1,23 +1,21 @@
 package com.ratingsystem.RatingSystem.entity;
 
+import com.ratingsystem.RatingSystem.enums.Role;
 import com.ratingsystem.RatingSystem.enums.Status;
 import jakarta.persistence.*;
-import com.ratingsystem.RatingSystem.enums.Role;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-import javax.xml.crypto.Data;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.Enumeration;
 
 @Entity
-@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name = "admins", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Setter
-@Getter
-public class User {
+public class Admin{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -25,11 +23,10 @@ public class User {
     private String lastName;
     private String password;
     private String email;
-    private boolean verified = false;
+    private boolean verified ;
     @Enumerated(EnumType.STRING)
-    private Status status = Status.PENDING;
+    private Status status;
     private LocalDate created_at;
     @Enumerated(EnumType.STRING)
-    private Role role = Role.SELLER;
-
+    private Role role;
 }

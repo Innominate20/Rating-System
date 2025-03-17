@@ -2,6 +2,7 @@ package com.ratingsystem.RatingSystem.security;
 
 import com.ratingsystem.RatingSystem.jwt.JwtFilter;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,11 +45,19 @@ public class SecurityConfig{
         httpSecurity
                 .authorizeHttpRequests(Config->
                         Config
-                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/auth/**", "/api/review/**").permitAll()
+                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
 
                         );
         httpSecurity.httpBasic(Customizer.withDefaults());
+        httpSecurity.exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"message\": \"Unauthorized access\"}");
+                })
+        );
         httpSecurity.formLogin(AbstractAuthenticationFilterConfigurer::disable);
         httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

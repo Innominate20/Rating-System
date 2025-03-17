@@ -1,5 +1,6 @@
 package com.ratingsystem.RatingSystem.dto;
 
+import com.ratingsystem.RatingSystem.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -18,6 +19,5 @@ public class UserRegisterRequest {
     @NotBlank(message = "Email is required")
     @Email(message = "Not email format !")
     private String email;
-
 
 }

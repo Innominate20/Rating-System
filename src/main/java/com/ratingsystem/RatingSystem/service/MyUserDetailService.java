@@ -1,6 +1,9 @@
 package com.ratingsystem.RatingSystem.service;
 
-import com.ratingsystem.RatingSystem.repository.UserRepository;
+import com.ratingsystem.RatingSystem.entity.Admin;
+import com.ratingsystem.RatingSystem.entity.Seller;
+import com.ratingsystem.RatingSystem.repository.AdminRepository;
+import com.ratingsystem.RatingSystem.repository.SellerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -15,25 +18,43 @@ import java.util.Optional;
 @Service
 public class MyUserDetailService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final SellerRepository sellerRepository;
+    private final AdminRepository adminRepository;
+
     @Autowired
-    public MyUserDetailService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public MyUserDetailService(SellerRepository sellerRepository, AdminRepository adminRepository) {
+        this.sellerRepository = sellerRepository;
+        this.adminRepository = adminRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
-        Optional<com.ratingsystem.RatingSystem.entity.User> optional = userRepository.findByEmail(userEmail);
+        Optional<Seller> optionalSeller = sellerRepository.findByEmail(userEmail);
+        String userToAuthenticateEmail ;
+        String userToAuthenticatePassword;
+        String userToAuthenticateRole;
 
-        if (optional.isEmpty()){
+        if (optionalSeller.isPresent()){
+           var user =  optionalSeller.get();
+           userToAuthenticateEmail = user.getEmail();
+           userToAuthenticatePassword = user.getPassword();
+           userToAuthenticateRole = user.getRole().toString();
+        }
+        else if(adminRepository.findByEmail(userEmail).isPresent()){
+            var user = adminRepository.findByEmail(userEmail).get();
+            userToAuthenticateEmail = user.getEmail();
+            userToAuthenticatePassword = user.getPassword();
+            userToAuthenticateRole = user.getRole().toString();
+        }
+        else {
             throw new UsernameNotFoundException("User not found !");
         }
-        com.ratingsystem.RatingSystem.entity.User user = optional.get();
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                List.of(new SimpleGrantedAuthority(user.getRole().toString()))
+
+        return new User(
+                userToAuthenticateEmail,
+                userToAuthenticatePassword,
+               List.of(new SimpleGrantedAuthority("ROLE_" + userToAuthenticateRole))
         );
     }
 }
