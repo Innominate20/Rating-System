@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.SecurityContext;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,6 +55,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 } catch (UsernameNotFoundException e) {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not found");
+
+                }catch (BadCredentialsException e){
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad credentials !");
                 }
             }
 

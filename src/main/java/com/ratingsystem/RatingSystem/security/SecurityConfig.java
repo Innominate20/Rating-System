@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.AbstractConfiguredSecurityBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -45,7 +46,7 @@ public class SecurityConfig{
         httpSecurity
                 .authorizeHttpRequests(Config->
                         Config
-                                .requestMatchers("/api/auth/**", "/api/review/**").permitAll()
+                                .requestMatchers("/api/auth/**", "/api/review/**", "/api/users/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
 
@@ -53,9 +54,19 @@ public class SecurityConfig{
         httpSecurity.httpBasic(Customizer.withDefaults());
         httpSecurity.exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"message\": \"Unauthorized access\"}");
+                    if (authException instanceof BadCredentialsException){
+
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"message\": \"Bad credentials !\"}");
+                    }
+                    else {
+
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"message\": \"Not authorized !\"}");
+                    }
+
                 })
         );
         httpSecurity.formLogin(AbstractAuthenticationFilterConfigurer::disable);

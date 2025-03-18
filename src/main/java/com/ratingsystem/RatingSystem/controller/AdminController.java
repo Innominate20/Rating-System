@@ -2,6 +2,7 @@ package com.ratingsystem.RatingSystem.controller;
 
 import com.ratingsystem.RatingSystem.dto.UserRegisterRequest;
 import com.ratingsystem.RatingSystem.service.AdminService;
+import com.ratingsystem.RatingSystem.service.CommentService;
 import com.ratingsystem.RatingSystem.service.RegisterService;
 import jakarta.validation.Valid;
 import lombok.Getter;
@@ -15,11 +16,13 @@ public class AdminController {
 
     private final RegisterService registerService;
     private final AdminService adminService;
+    private final CommentService commentService;
 
     @Autowired
-    public AdminController(RegisterService registerService, AdminService adminService) {
+    public AdminController(RegisterService registerService, AdminService adminService, CommentService commentService) {
         this.registerService = registerService;
         this.adminService = adminService;
+        this.commentService = commentService;
     }
 
     @PostMapping("/register")
@@ -32,4 +35,14 @@ public class AdminController {
         return adminService.approveUser(email);
     }
 
+    @PostMapping("comment/approve/{id}")
+    public ResponseEntity<?> approveComment(@PathVariable("id") int id){
+        return adminService.approveComment(id);
+    }
+
+    @GetMapping("/comment/all")
+    public ResponseEntity<?> viewComments(){
+
+        return commentService.getComments();
+    }
 }

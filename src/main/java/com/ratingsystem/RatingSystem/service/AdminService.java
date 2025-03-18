@@ -1,8 +1,10 @@
 package com.ratingsystem.RatingSystem.service;
 
+import com.ratingsystem.RatingSystem.entity.Comment;
 import com.ratingsystem.RatingSystem.entity.Seller;
 import com.ratingsystem.RatingSystem.enums.Role;
 import com.ratingsystem.RatingSystem.enums.Status;
+import com.ratingsystem.RatingSystem.repository.CommentRepository;
 import com.ratingsystem.RatingSystem.repository.SellerRepository;
 import jakarta.transaction.Transactional;
 import org.aspectj.apache.bcel.classfile.Module;
@@ -18,10 +20,12 @@ import java.util.Optional;
 public class AdminService {
 
     private final SellerRepository sellerRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
-    public AdminService(SellerRepository sellerRepository) {
+    public AdminService(SellerRepository sellerRepository, CommentRepository commentRepository) {
         this.sellerRepository = sellerRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Transactional
@@ -46,5 +50,21 @@ public class AdminService {
         return ResponseEntity.status(HttpStatus.OK).body(sellers);
     }
 
+    @Transactional
+    public ResponseEntity<?> approveComment(int id){
+        Optional<Comment> optionalComment = commentRepository.findById(id);
+
+        if(optionalComment.isEmpty()){
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Comment with the id : " + id+ " not found !");
+        }
+
+        Comment comment = optionalComment.get();
+        comment.setStatus(Status.APPROVED);
+
+        commentRepository.save(comment);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Comment approved successfully !");
+    }
 
 }

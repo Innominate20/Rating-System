@@ -62,7 +62,7 @@ public class GameObjectService {
         Optional<GameObject> optional = gameObjectRepository.findById(id);
 
         if (optional.isEmpty()){
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body("GameObject not found !");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("GameObject not found !");
         }
         GameObject tmpGameObject = optional.get();
 
@@ -84,7 +84,7 @@ public class GameObjectService {
 
         Optional<GameObject> optional = gameObjectRepository.findById(id);
         if (optional.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("GameObject not found !");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("GameObject with the id : "+id+ " not found !");
         }
 
         GameObject gameObjectToDelete = optional.get();

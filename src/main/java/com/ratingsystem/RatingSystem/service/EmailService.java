@@ -1,8 +1,10 @@
 package com.ratingsystem.RatingSystem.service;
 
+import com.ratingsystem.RatingSystem.exception.MailSendFailure;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class EmailService {
         mimeMessageHelper.setTo(email);
         mimeMessageHelper.setSubject(subject);
         mimeMessageHelper.setText(content);
+
         javaMailSender.send(mimeMessage);
 
     }
