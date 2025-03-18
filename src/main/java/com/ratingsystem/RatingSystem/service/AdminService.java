@@ -19,52 +19,36 @@ import java.util.Optional;
 @Service
 public class AdminService {
 
-    private final SellerRepository sellerRepository;
-    private final CommentRepository commentRepository;
+    private final SellerService sellerService;
+    private final CommentService commentService;
 
     @Autowired
-    public AdminService(SellerRepository sellerRepository, CommentRepository commentRepository) {
-        this.sellerRepository = sellerRepository;
-        this.commentRepository = commentRepository;
+    public AdminService(SellerService sellerService, CommentService commentService) {
+
+        this.sellerService = sellerService;
+        this.commentService = commentService;
     }
 
     @Transactional
-    public ResponseEntity<String> approveUser(String email){
-        Optional<Seller> optionalSeller = sellerRepository.findByEmail(email);
-        if (optionalSeller.isEmpty()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No users with this email found !");
-        }
-        Seller sellerToApprove = optionalSeller.get();
+    public ResponseEntity<?> approveSellers(String ids){
 
-        sellerToApprove.setStatus(Status.APPROVED);
-        sellerRepository.save(sellerToApprove);
-        return ResponseEntity.status(HttpStatus.OK).body("User approved successfully !");
+        return sellerService.changeStatusToApproved(ids);
     }
 
-    public ResponseEntity<?> getSellers(){
+    public ResponseEntity<?> getUnapprovedSellers(){
 
-        var sellers  = sellerRepository.findAll();
-        if(sellers.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No sellers found !");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(sellers);
+        return sellerService.findUnapprovedSellers();
     }
 
     @Transactional
-    public ResponseEntity<?> approveComment(int id){
-        Optional<Comment> optionalComment = commentRepository.findById(id);
+    public ResponseEntity<?> approveComments(String ids){
 
-        if(optionalComment.isEmpty()){
+        return commentService.changeStatusToApproved(ids);
+    }
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Comment with the id : " + id+ " not found !");
-        }
+    public ResponseEntity<?> getUnapprovedComments(){
 
-        Comment comment = optionalComment.get();
-        comment.setStatus(Status.APPROVED);
-
-        commentRepository.save(comment);
-
-        return ResponseEntity.status(HttpStatus.OK).body("Comment approved successfully !");
+        return commentService.findUnapprovedComments();
     }
 
 }

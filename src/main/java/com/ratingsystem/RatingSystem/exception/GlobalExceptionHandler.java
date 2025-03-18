@@ -39,4 +39,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mailSendFailure.getMessage());
     }
 
+    @ExceptionHandler(InvalidIdException.class)
+    public ResponseEntity<?> handleInvalidIdFormat(InvalidIdException invalidIdException){
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(invalidIdException.getMessage());
+    }
 }

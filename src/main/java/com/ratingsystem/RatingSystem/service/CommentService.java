@@ -1,6 +1,7 @@
 package com.ratingsystem.RatingSystem.service;
 
-import com.ratingsystem.RatingSystem.cookieUtil.CookieUtility;
+import com.ratingsystem.RatingSystem.exception.InvalidIdException;
+import com.ratingsystem.RatingSystem.util.CookieUtility;
 import com.ratingsystem.RatingSystem.dto.CommentRequest;
 import com.ratingsystem.RatingSystem.dto.UserRegisterRequest;
 import com.ratingsystem.RatingSystem.entity.Comment;
@@ -18,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -56,7 +59,7 @@ public class CommentService {
             httpServletResponse.addCookie(cookie);
 
             var comment = Comment.builder()
-                    .author_id(uuid)
+                    .authorId(uuid)
                     .created_at(LocalDate.now())
                     .rating(commentRequest.getRating())
                     .message(commentRequest.getMessage())
@@ -66,11 +69,11 @@ public class CommentService {
 
             commentRepository.save(comment);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body("Comment saved waiting administrator approval ! \n Warning : Do not delete cookies in order to keep connection with your comments !");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Comment saved, waiting administrator approval ! \n Warning : Do not delete cookies in order to keep connection with your comments !");
         }
 
         var comment = Comment.builder()
-                .author_id(UUID.fromString(isCookiePresent))
+                .authorId(UUID.fromString(isCookiePresent))
                 .created_at(LocalDate.now())
                 .rating(commentRequest.getRating())
                 .message(commentRequest.getMessage())
@@ -80,7 +83,7 @@ public class CommentService {
 
         commentRepository.save(comment);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("Comment saved waiting administrator approval !");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Comment saved, waiting administrator approval !");
     }
 
     public ResponseEntity<?> getSellerComments(String email){
@@ -97,20 +100,18 @@ public class CommentService {
 
         if (commentList == null){
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Seller has not comments yet !");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Seller has no comments yet !");
         }
 
-        var approvedComments = commentList.stream()
-                .filter(comment -> comment.getStatus().equals(Status.APPROVED));
 
-        return ResponseEntity.status(HttpStatus.OK).body(approvedComments);
+        return ResponseEntity.status(HttpStatus.OK).body(commentList);
     }
 
     public ResponseEntity<?> getComment(int id){
         Optional<Comment> optionalComment = commentRepository.findById(id);
 
         if (optionalComment.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No comments found with this id : "+ id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No comments found with the id : "+ id);
         }
 
         Comment comment = optionalComment.get();
@@ -121,21 +122,22 @@ public class CommentService {
     @Transactional
     public ResponseEntity<String> deleteComment(int id, HttpServletRequest httpServletRequest){
 
-        String isCookiePresent = CookieUtility.getIdFromCookie(httpServletRequest, "UserId");
+        String uuid = CookieUtility.getIdFromCookie(httpServletRequest, "UserId");
 
-        if (isCookiePresent == null){
+        if (uuid == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You do not have comment ownership !");
         }
 
         Optional<Comment> optionalComment = commentRepository.findById(id);
 
         if (optionalComment.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Comment with the id : "+ id + " does not exists !");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Comment with the id : "+ id + " - does not exists !");
         }
 
         Comment comment = optionalComment.get();
 
-        if (comment.getAuthor_id() != UUID.fromString(isCookiePresent)){
+        if (! comment.getAuthorId().equals(UUID.fromString(uuid))){
+
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the author of the comment !");
         }
 
@@ -147,21 +149,21 @@ public class CommentService {
     @Transactional
     public ResponseEntity<String> updateComment(int id, HttpServletRequest httpServletRequest, CommentRequest commentRequest){
 
-        String isCookiePresent = CookieUtility.getIdFromCookie(httpServletRequest, "UserId");
+        String uuid = CookieUtility.getIdFromCookie(httpServletRequest, "UserId");
 
-        if (isCookiePresent == null){
+        if (uuid == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You do not have comment ownership !");
         }
 
         Optional<Comment> optionalComment = commentRepository.findById(id);
 
         if (optionalComment.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Comment with the id : "+ id + " does not exists !");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Comment with the id : "+ id + "- does not exists !");
         }
 
         Comment comment = optionalComment.get();
 
-        if (comment.getAuthor_id() != UUID.fromString(isCookiePresent)){
+        if (! comment.getAuthorId().equals(UUID.fromString(uuid))){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the author of the comment !");
         }
 
@@ -178,14 +180,64 @@ public class CommentService {
         return registerService.registerSeller(userRegisterRequest);
     }
 
-    public ResponseEntity<?> getComments(){
-        var commentlist =  commentRepository.findAll();
+    public ResponseEntity<?> getComments(HttpServletRequest request){
 
-        if (commentlist.isEmpty()){
+         String uuid = CookieUtility.getIdFromCookie(request,"UserId");
+
+         if (uuid == null){
+             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("You have no comments or lost association with them !");
+         }
+
+        var commentList =  commentRepository.findByAuthorId(UUID.fromString(uuid));
+
+        if (commentList.isEmpty()){
 
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No comments found !");
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(commentlist);
+        return ResponseEntity.status(HttpStatus.OK).body(commentList);
     }
+
+    //retrieve unapproved comments
+    public ResponseEntity<?> findUnapprovedComments(){
+
+        var pendingComments = commentRepository.findByStatus(Status.PENDING);
+
+        if (pendingComments.isEmpty()){
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No unapproved comments !");
+            }
+
+        return ResponseEntity.status(HttpStatus.OK).body(pendingComments);
+    }
+
+
+    @Transactional
+    public ResponseEntity<?> changeStatusToApproved(String ids){
+
+        try {
+            List<Integer> idList = Arrays.stream(ids.split(","))
+                    .map(Integer::parseInt)
+                    .toList();
+
+            var commentsToApprove = commentRepository.findAllById(idList);
+
+            if (commentsToApprove.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No unapproved comments with the id : "+ids);
+            }
+
+            var approvedComments = commentsToApprove.stream()
+                    .peek(comment -> comment.setStatus(Status.APPROVED))
+                    .toList();
+
+            int numberOfApprovedComments = approvedComments.size();
+
+            commentRepository.saveAll(approvedComments);
+            return ResponseEntity.status(HttpStatus.OK).body(numberOfApprovedComments +" comments approved successfully !");
+        }catch (Exception e){
+            throw new InvalidIdException("InvalidIdFormat : " + ids);
+        }
+
+    }
+
 }

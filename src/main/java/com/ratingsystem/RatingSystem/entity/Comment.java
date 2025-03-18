@@ -22,7 +22,9 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String message;
-    private UUID author_id;
+    @Column(name = "author_id")
+    @JsonIgnore
+    private UUID authorId;
     @ManyToOne
     @JoinColumn(name = "seller_id")
     @JsonIgnore

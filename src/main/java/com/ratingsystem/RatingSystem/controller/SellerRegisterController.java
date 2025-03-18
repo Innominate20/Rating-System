@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-public class RegisterController {
+public class SellerRegisterController {
 
     private final RegisterService registerService;
     @Autowired
-    public RegisterController(RegisterService registerService) {
+    public SellerRegisterController(RegisterService registerService) {
         this.registerService = registerService;
     }
 

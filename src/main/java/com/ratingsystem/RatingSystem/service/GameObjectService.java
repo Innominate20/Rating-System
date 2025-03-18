@@ -90,7 +90,7 @@ public class GameObjectService {
         GameObject gameObjectToDelete = optional.get();
 
         if(gameObjectToDelete.getSeller().getId() != seller.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the owner of GameObject");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the owner of the GameObject");
         }
 
         gameObjectRepository.delete(gameObjectToDelete);

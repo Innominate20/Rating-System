@@ -12,28 +12,26 @@ import java.time.LocalDate;
 @RequestMapping("/api/review")
 public class ReviewController {
 
-    private final GameObjectService gameObjectService;
     private final ReviewService reviewService;
 
     @Autowired
-    public ReviewController(GameObjectService gameObjectService, ReviewService reviewService) {
-        this.gameObjectService = gameObjectService;
+    public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
 
-    @GetMapping("/sellers/comments")
-    public ResponseEntity<?> reviewSellers(){
+    @GetMapping("/seller/profile")
+    public ResponseEntity<?> viewProfile(){
 
-        return gameObjectService.getGameObjects();
+        return reviewService.viewProfile();
     }
 
-    @GetMapping("/sellers/rating")
+    @GetMapping("/seller/rating")
     public ResponseEntity<?> getRatingsBySeller(){
 
         return reviewService.getSellersRating();
     }
 
-    @GetMapping("/sellers/top/{topN}")
+    @GetMapping("/seller/top/{topN}")
     public ResponseEntity<?> getTopSellers(@PathVariable("topN") int topN){
 
         return reviewService.getTopSellers(topN);
@@ -51,7 +49,7 @@ public class ReviewController {
         return reviewService.filterGameObject(gameObjectTitle,idLess,idMore,idEquals,sellerId,createdBefore,createdAfter);
     }
 
-    @PostMapping("/sellers/filter")
+    @PostMapping("/seller/filterByRating")
     public ResponseEntity<?> filterByRating(@RequestParam(required = false, defaultValue = "0") double ratingLower,
                                             @RequestParam(required = false, defaultValue = "0") double ratingUpper,
                                             @RequestParam(required = false, defaultValue = "0") double ratingEquals){

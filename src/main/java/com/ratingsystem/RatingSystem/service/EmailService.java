@@ -5,6 +5,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -19,16 +20,16 @@ public class EmailService {
 
     public void sendVerificationCode(String email, String token) throws MessagingException {
 
-        String subject = "Account verification";
-        String content = "Your token= " + token;
+            String subject = "Account verification";
+            String content = "Your token= " + token;
 
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-        mimeMessageHelper.setTo(email);
-        mimeMessageHelper.setSubject(subject);
-        mimeMessageHelper.setText(content);
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+            mimeMessageHelper.setTo(email);
+            mimeMessageHelper.setSubject(subject);
+            mimeMessageHelper.setText(content);
 
-        javaMailSender.send(mimeMessage);
+            javaMailSender.send(mimeMessage);
 
     }
 }

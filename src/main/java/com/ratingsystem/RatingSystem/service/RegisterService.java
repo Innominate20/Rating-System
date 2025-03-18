@@ -5,6 +5,7 @@ import com.ratingsystem.RatingSystem.entity.Admin;
 import com.ratingsystem.RatingSystem.entity.Seller;
 import com.ratingsystem.RatingSystem.enums.Role;
 import com.ratingsystem.RatingSystem.enums.Status;
+import com.ratingsystem.RatingSystem.exception.MailSendFailure;
 import com.ratingsystem.RatingSystem.repository.AdminRepository;
 import com.ratingsystem.RatingSystem.repository.SellerRepository;
 import com.ratingsystem.RatingSystem.util.TokenGeneratorUtil;
@@ -13,6 +14,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -67,11 +70,12 @@ public class RegisterService {
 
         try {
             emailService.sendVerificationCode(userRegisterRequest.getEmail(),token);
-        } catch (MessagingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending verification code !");
-        }
-        return  ResponseEntity.status(HttpStatus.CREATED).body("User created, waiting verification !");
 
+        } catch (MessagingException e) {
+            throw new MailSendFailure("Email failed to send : " + e.getMessage());
+        }
+
+        return  ResponseEntity.status(HttpStatus.CREATED).body("User created, waiting verification !");
     }
 
     public ResponseEntity<String> registerAdmin(UserRegisterRequest userRegisterRequest){

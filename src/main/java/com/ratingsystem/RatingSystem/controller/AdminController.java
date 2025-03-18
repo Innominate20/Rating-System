@@ -16,13 +16,11 @@ public class AdminController {
 
     private final RegisterService registerService;
     private final AdminService adminService;
-    private final CommentService commentService;
 
     @Autowired
-    public AdminController(RegisterService registerService, AdminService adminService, CommentService commentService) {
+    public AdminController(RegisterService registerService, AdminService adminService) {
         this.registerService = registerService;
         this.adminService = adminService;
-        this.commentService = commentService;
     }
 
     @PostMapping("/register")
@@ -30,19 +28,26 @@ public class AdminController {
        return registerService.registerAdmin(userRegisterRequest);
     }
 
-    @PostMapping("/users/approve/{email}")
-    public ResponseEntity<String> approveUser(@PathVariable("email") String email){
-        return adminService.approveUser(email);
+    @GetMapping("/seller/unapproved")
+    public ResponseEntity<?> getUnApprovedUsers(){
+
+        return adminService.getUnapprovedSellers();
     }
 
-    @PostMapping("comment/approve/{id}")
-    public ResponseEntity<?> approveComment(@PathVariable("id") int id){
-        return adminService.approveComment(id);
+    @PostMapping("/seller/approve/{ids}")
+    public ResponseEntity<?> approveSellers(@PathVariable("ids") String ids){
+
+        return adminService.approveSellers(ids);
     }
 
-    @GetMapping("/comment/all")
-    public ResponseEntity<?> viewComments(){
+    @PostMapping("comment/approve/{ids}")
+    public ResponseEntity<?> approveComment(@PathVariable("ids") String ids){
 
-        return commentService.getComments();
+        return adminService.approveComments(ids);
+    }
+
+    @GetMapping("/comment/unapproved")
+    public ResponseEntity<?> getUnapprovedComments(){
+        return adminService.getUnapprovedComments();
     }
 }

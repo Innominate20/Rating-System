@@ -27,21 +27,25 @@ public class GameObjectController {
 
     @GetMapping("/item/all")
     public ResponseEntity<?> getGameObjects(){
+
         return gameObjectService.getGameObjects();
     }
 
     @PutMapping("/item/{id}")
     public ResponseEntity<String> updateGameObject(@PathVariable("id") int id, @RequestBody GameObjectRequest gameObjectRequest){
+
         return gameObjectService.updateGameObject(id,gameObjectRequest);
     }
 
     @DeleteMapping("item/{id}")
     public ResponseEntity<String> deleteGameObject(@PathVariable("id") int id){
+
         return gameObjectService.deleteGameObject(id);
     }
 
     @GetMapping("/item/me")
     public ResponseEntity<?> getMyItems(){
+
         return gameObjectService.getMyGameObjects();
     }
 }

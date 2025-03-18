@@ -42,7 +42,7 @@ public class LoginService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User needs verification !");
             }
             else if(tmpUSeller.getStatus() != Status.APPROVED){
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is not approved by administrator yet !");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is not approved by the administrator yet !");
             }
 
             Authentication authentication = authenticationManager.authenticate(

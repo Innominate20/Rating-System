@@ -1,27 +1,14 @@
 package com.ratingsystem.RatingSystem.controller;
 
-import com.ratingsystem.RatingSystem.cookieUtil.CookieUtility;
 import com.ratingsystem.RatingSystem.dto.CommentRequest;
 import com.ratingsystem.RatingSystem.dto.UserRegisterRequest;
-import com.ratingsystem.RatingSystem.entity.Comment;
-import com.ratingsystem.RatingSystem.entity.Seller;
-import com.ratingsystem.RatingSystem.enums.Status;
-import com.ratingsystem.RatingSystem.repository.CommentRepository;
-import com.ratingsystem.RatingSystem.repository.SellerRepository;
 import com.ratingsystem.RatingSystem.service.CommentService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -41,18 +28,25 @@ public class CommentController {
         return commentService.submitComment(email,request,response,commentRequest);
     }
 
-    @GetMapping("/comment/{email}")
+    @GetMapping("/comment/me")
+    public ResponseEntity<?> getMyComments(HttpServletRequest request){
+
+        return commentService.getComments(request);
+    }
+
+    @GetMapping("/comment/email/{email}")
     public ResponseEntity<?> getSellerCommentMethod(@PathVariable("email") String email){
+
         return commentService.getSellerComments(email);
     }
 
-    @GetMapping("/comment/{id}")
+    @GetMapping("/comment/id/{id}")
     public ResponseEntity<?> getCommentMethod(@PathVariable("id") int id){
 
         return commentService.getComment(id);
     }
 
-    @DeleteMapping("comment/id")
+    @DeleteMapping("comment/{id}")
     public ResponseEntity<?> deleteCommentMethod(@PathVariable("id") int id,HttpServletRequest request){
 
         return commentService.deleteComment(id,request);
@@ -66,7 +60,8 @@ public class CommentController {
 
     @PostMapping("/comment/create/profile")
     public ResponseEntity<?> createSellerProfile(@Valid @RequestBody UserRegisterRequest userRegisterRequest){
-       return commentService.createSellerFromComment(userRegisterRequest);
+
+        return commentService.createSellerFromComment(userRegisterRequest);
     }
 
 }
