@@ -72,6 +72,7 @@ public class RegisterService {
             emailService.sendVerificationCode(userRegisterRequest.getEmail(),token);
 
         } catch (MessagingException e) {
+
             throw new MailSendFailure("Email failed to send : " + e.getMessage());
         }
 
@@ -80,6 +81,7 @@ public class RegisterService {
 
     public ResponseEntity<String> registerAdmin(UserRegisterRequest userRegisterRequest){
         Optional<Admin> optionalAdmin = adminRepository.findByEmail(userRegisterRequest.getEmail());
+
         if (optionalAdmin.isPresent()){
             ResponseEntity.status(HttpStatus.CONFLICT).body("User with this email already exists !");
         }
