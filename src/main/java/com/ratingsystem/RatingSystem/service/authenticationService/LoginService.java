@@ -1,4 +1,4 @@
-package com.ratingsystem.RatingSystem.service;
+package com.ratingsystem.RatingSystem.service.authenticationService;
 
 import com.ratingsystem.RatingSystem.dto.LoginRequest;
 import com.ratingsystem.RatingSystem.entity.Admin;

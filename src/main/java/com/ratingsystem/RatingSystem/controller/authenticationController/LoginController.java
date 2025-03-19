@@ -1,9 +1,8 @@
-package com.ratingsystem.RatingSystem.controller;
+package com.ratingsystem.RatingSystem.controller.authenticationController;
 
 import com.ratingsystem.RatingSystem.dto.LoginRequest;
-import com.ratingsystem.RatingSystem.service.LoginService;
+import com.ratingsystem.RatingSystem.service.authenticationService.LoginService;
 import jakarta.validation.Valid;
-import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

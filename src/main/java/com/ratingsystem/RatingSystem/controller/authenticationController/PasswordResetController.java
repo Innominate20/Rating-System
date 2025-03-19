@@ -1,7 +1,7 @@
-package com.ratingsystem.RatingSystem.controller;
+package com.ratingsystem.RatingSystem.controller.authenticationController;
 
 import com.ratingsystem.RatingSystem.dto.PasswordResetRequest;
-import com.ratingsystem.RatingSystem.service.PasswordResetService;
+import com.ratingsystem.RatingSystem.service.authenticationService.PasswordResetService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

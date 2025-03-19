@@ -1,6 +1,6 @@
-package com.ratingsystem.RatingSystem.controller;
+package com.ratingsystem.RatingSystem.controller.authenticationController;
 
-import com.ratingsystem.RatingSystem.service.VerificationService;
+import com.ratingsystem.RatingSystem.service.authenticationService.VerificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;

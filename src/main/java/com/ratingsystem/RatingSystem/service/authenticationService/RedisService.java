@@ -1,7 +1,6 @@
-package com.ratingsystem.RatingSystem.service;
+package com.ratingsystem.RatingSystem.service.authenticationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 

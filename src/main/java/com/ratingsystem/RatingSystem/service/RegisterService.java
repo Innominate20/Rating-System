@@ -8,14 +8,14 @@ import com.ratingsystem.RatingSystem.enums.Status;
 import com.ratingsystem.RatingSystem.exception.MailSendFailure;
 import com.ratingsystem.RatingSystem.repository.AdminRepository;
 import com.ratingsystem.RatingSystem.repository.SellerRepository;
+import com.ratingsystem.RatingSystem.service.authenticationService.EmailService;
+import com.ratingsystem.RatingSystem.service.authenticationService.RedisService;
 import com.ratingsystem.RatingSystem.util.TokenGeneratorUtil;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.MailException;
-import org.springframework.mail.MailSendException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 

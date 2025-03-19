@@ -1,4 +1,4 @@
-package com.ratingsystem.RatingSystem.service;
+package com.ratingsystem.RatingSystem.service.authenticationService;
 
 import com.ratingsystem.RatingSystem.entity.Seller;
 import com.ratingsystem.RatingSystem.exception.MailSendFailure;

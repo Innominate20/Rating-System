@@ -1,6 +1,5 @@
-package com.ratingsystem.RatingSystem.service;
+package com.ratingsystem.RatingSystem.service.authenticationService;
 
-import com.ratingsystem.RatingSystem.entity.Admin;
 import com.ratingsystem.RatingSystem.entity.Seller;
 import com.ratingsystem.RatingSystem.repository.AdminRepository;
 import com.ratingsystem.RatingSystem.repository.SellerRepository;

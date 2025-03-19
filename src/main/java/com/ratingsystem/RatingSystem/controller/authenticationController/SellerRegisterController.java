@@ -1,4 +1,4 @@
-package com.ratingsystem.RatingSystem.controller;
+package com.ratingsystem.RatingSystem.controller.authenticationController;
 
 import com.ratingsystem.RatingSystem.dto.UserRegisterRequest;
 import com.ratingsystem.RatingSystem.service.RegisterService;
